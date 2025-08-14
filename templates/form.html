@@ -44,6 +44,10 @@
                 <label class="form-check-label" for="cons">
                   Acepto el aviso de privacidad y autorizo el uso de mis datos para fines del evento.
                 </label>
+                <small class="text-muted d-block mt-1">
+                  Consulta el
+                  <a href="#" data-bs-toggle="modal" data-bs-target="#avisoPrivacidadModal">Aviso de Privacidad</a>.
+                </small>
               </div>
             </div>
           </div>
@@ -53,6 +57,38 @@
           </div>
           <div id="msg" class="mt-3"></div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal: Aviso de Privacidad -->
+<div class="modal fade" id="avisoPrivacidadModal" tabindex="-1" aria-labelledby="avisoPrivacidadLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="avisoPrivacidadLabel">Aviso de Privacidad</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          La información personal que nos proporcionas será utilizada únicamente para gestionar tu registro y
+          asistencia al evento, generar listados y, en su caso, enviarte comunicaciones relacionadas.
+        </p>
+        <p>
+          Los datos recabados incluyen: nombre, apellidos, correo electrónico y, de forma opcional, teléfono,
+          institución y carrera/área. No compartiremos tus datos con terceros salvo obligación legal.
+        </p>
+        <p>
+          Tienes derecho a acceder, rectificar y cancelar tus datos, así como a oponerte a su tratamiento.
+          Para ejercer estos derechos o realizar cualquier consulta sobre el tratamiento de tus datos,
+          contáctanos a través del medio indicado por la organización del evento.
+        </p>
+        <p class="mb-0">
+          Al marcar la casilla de consentimiento, confirmas que has leído y aceptas este aviso de privacidad.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
