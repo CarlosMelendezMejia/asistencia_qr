@@ -24,9 +24,36 @@ body {
 	border: 1px solid var(--border);
 	box-shadow: 0 2px 10px rgba(17, 24, 39, .06);
 }
-.card .card-body { padding: 1.25rem; }
+.card .card-body {
+	padding: 1.25rem;
+ }
 @media (min-width: 768px) {
 	.card .card-body { padding: 2rem; }
+}
+
+/* Form page specific adjustments */
+.form-card { display: block; margin: 0 auto; }
+.form-card-body {
+	width: 40rem; /* updated requested width */
+	max-width: 100%; /* avoids overflow on small screens */
+	margin: 0 auto; /* center the inner content */
+}
+
+/* Make inner elements adapt within the narrow card */
+.form-card .row.g-3 { --bs-gutter-x: .75rem; }
+.form-card .form-control,
+.form-card .form-select,
+.form-card textarea { width: 100%; }
+.form-card .d-grid { margin-top: 1rem; }
+.form-card .h4 { font-size: 1.05rem; }
+.form-card p.text-muted { font-size: .85rem; }
+
+/* Force fields to stack in the 15rem layout */
+@media (min-width: 0px) {
+	.form-card .col-12,
+	.form-card .col-md-4,
+	.form-card .col-md-6,
+	.form-card .col-md-8 { flex: 0 0 100%; max-width: 100%; }
 }
 
 /* Typography tweaks */
