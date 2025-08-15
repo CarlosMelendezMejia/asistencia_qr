@@ -281,7 +281,7 @@
       </div>
     </div>
   </nav>
-  <main class="container py-4">
+  <main class="{% block container_class %}container{% endblock %} py-4">
     {% block content %}
     <!-- Aquí iría el contenido específico del formulario -->
     <div class="form-section">
