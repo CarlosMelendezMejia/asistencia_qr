@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS registro (
   telefono VARCHAR(30) NULL,
   institucion VARCHAR(180) NULL,
   carrera_o_area VARCHAR(180) NULL,
+  temas_interes TEXT NULL,
   consentimiento TINYINT(1) NOT NULL DEFAULT 0,
   asistencia_marcarda_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   ip VARCHAR(45) NULL,

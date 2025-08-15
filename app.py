@@ -69,6 +69,7 @@ def api_registro():
     telefono = (data.get("telefono") or "").strip()
     institucion = (data.get("institucion") or "").strip()
     carrera = (data.get("carrera_o_area") or "").strip()
+    temas = (data.get("temas_interes") or "").strip()
     consentimiento = 1 if str(data.get("consentimiento", "0")) in ("1", "true", "on") else 0
 
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
@@ -90,10 +91,10 @@ def api_registro():
     try:
         cur.execute("""
             INSERT INTO registro
-            (id_evento, nombre, apellidos, email, telefono, institucion, carrera_o_area,
+            (id_evento, nombre, apellidos, email, telefono, institucion, carrera_o_area, temas_interes,
              consentimiento, asistencia_marcarda_en, ip, user_agent)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s, NOW(), %s,%s)
-        """, (id_evento, nombre, apellidos, email, telefono, institucion, carrera, consentimiento, ip, ua))
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s, NOW(), %s,%s)
+        """, (id_evento, nombre, apellidos, email, telefono, institucion, carrera, temas, consentimiento, ip, ua))
         cnx.commit()
     except mysql.connector.Error as e:
         cur.close(); cnx.close()
@@ -160,7 +161,7 @@ def admin_export():
     cur = cnx.cursor(dictionary=True)
     cur.execute("""
         SELECT e.slug, e.titulo, r.nombre, r.apellidos, r.email, r.telefono,
-               r.institucion, r.carrera_o_area, r.consentimiento, r.asistencia_marcarda_en, r.creado_en
+               r.institucion, r.carrera_o_area, r.temas_interes, r.consentimiento, r.asistencia_marcarda_en, r.creado_en
         FROM registro r
         JOIN evento e ON e.id = r.id_evento
         WHERE e.slug=%s
@@ -172,10 +173,10 @@ def admin_export():
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(["slug","titulo","nombre","apellidos","email","telefono","institucion",
-                     "carrera_o_area","consentimiento","asistencia_marcarda_en","creado_en"])
+                     "carrera_o_area","temas_interes","consentimiento","asistencia_marcarda_en","creado_en"])
     for r in rows:
         writer.writerow([r["slug"], r["titulo"], r["nombre"], r["apellidos"], r["email"], r["telefono"],
-                         r["institucion"], r["carrera_o_area"], r["consentimiento"],
+                         r["institucion"], r["carrera_o_area"], r["temas_interes"], r["consentimiento"],
                          r["asistencia_marcarda_en"], r["creado_en"]])
     csv_data = output.getvalue().encode("utf-8-sig")  # BOM para Excel
     resp = make_response(csv_data)
