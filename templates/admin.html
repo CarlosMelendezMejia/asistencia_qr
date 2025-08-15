@@ -86,6 +86,7 @@
               <th>Teléfono</th>
               <th>Institución</th>
               <th>Carrera/Área</th>
+              <th>Temas de interés</th>
               <th>Consent.</th>
               <th>Asistencia</th>
               <th>Registrado</th>
@@ -101,6 +102,7 @@
               <td>{{ r.telefono or "" }}</td>
               <td>{{ r.institucion or "" }}</td>
               <td>{{ r.carrera_o_area or "" }}</td>
+              <td>{{ r.temas_interes or "" }}</td>
               <td>{{ "Sí" if r.consentimiento else "No" }}</td>
               <td>{{ r.asistencia_marcarda_en }}</td>
               <td>{{ r.creado_en }}</td>
