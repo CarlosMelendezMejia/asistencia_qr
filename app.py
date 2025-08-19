@@ -30,6 +30,26 @@ DB_CONFIG = {
 def db_conn():
     return mysql.connector.connect(**DB_CONFIG)
 
+
+def get_default_slug():
+    slug = os.getenv("DEFAULT_EVENT_SLUG")
+    if slug:
+        return slug
+    cnx = cur = None
+    try:
+        cnx = db_conn()
+        cur = cnx.cursor()
+        cur.execute(
+            "SELECT slug FROM evento WHERE activo=1 ORDER BY fecha_inicio DESC, creado_en DESC LIMIT 1"
+        )
+        row = cur.fetchone()
+        return row[0] if row else None
+    finally:
+        if cur:
+            cur.close()
+        if cnx:
+            cnx.close()
+
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -40,7 +60,10 @@ def admin_required(f):
 
 @app.get("/")
 def index():
-    return redirect(url_for("evento_form", slug="ponencia-ia-ago2025"))  # cambia al evento real
+    slug = get_default_slug()
+    if slug:
+        return redirect(url_for("evento_form", slug=slug))
+    return render_template("no_event.html")
 
 @app.get("/evento/<slug>")
 def evento_form(slug):
