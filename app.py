@@ -75,35 +75,49 @@ def api_registro():
     ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     ua = request.headers.get("User-Agent", "")
 
-    cnx = db_conn()
-    cur = cnx.cursor(dictionary=True)
-
-    # 1) buscar evento
-    cur.execute("SELECT id FROM evento WHERE slug=%s AND activo=1", (slug,))
-    evt = cur.fetchone()
-    if not evt:
-        cur.close(); cnx.close()
-        return jsonify({"ok": False, "error": "Evento no encontrado o inactivo"}), 404
-
-    id_evento = evt["id"]
-
-    # 2) insertar (o rechazar duplicado por email en el mismo evento)
+    cnx = cur = None
     try:
-        cur.execute("""
-            INSERT INTO registro
-            (id_evento, nombre, apellidos, email, telefono, institucion, carrera_o_area, temas_interes,
-             consentimiento, asistencia_marcarda_en, ip, user_agent)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s, NOW(), %s,%s)
-        """, (id_evento, nombre, apellidos, email, telefono, institucion, carrera, temas, consentimiento, ip, ua))
-        cnx.commit()
-    except mysql.connector.Error as e:
-        cur.close(); cnx.close()
-        if e.errno == 1062:
-            return jsonify({"ok": False, "error": "Este email ya está registrado para este evento."}), 409
-        return jsonify({"ok": False, "error": f"DB error: {e}"}), 500
+        cnx = db_conn()
+        cur = cnx.cursor(dictionary=True)
 
-    cur.close(); cnx.close()
-    return jsonify({"ok": True})
+        # 1) buscar evento
+        cur.execute("SELECT id FROM evento WHERE slug=%s AND activo=1", (slug,))
+        evt = cur.fetchone()
+        if not evt:
+            return jsonify({"ok": False, "error": "Evento no encontrado o inactivo"}), 404
+
+        id_evento = evt["id"]
+
+        # 2) insertar (o rechazar duplicado por email en el mismo evento)
+        try:
+            cur.execute(
+                """
+                INSERT INTO registro
+                (id_evento, nombre, apellidos, email, telefono, institucion, carrera_o_area, temas_interes,
+                 consentimiento, asistencia_marcarda_en, ip, user_agent)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s, NOW(), %s,%s)
+            """,
+                (id_evento, nombre, apellidos, email, telefono, institucion, carrera, temas, consentimiento, ip, ua),
+            )
+            cnx.commit()
+        except mysql.connector.Error as e:
+            app.logger.warning("Registro duplicado o error de inserción: %s", e)
+            if e.errno == 1062:
+                return jsonify({"ok": False, "error": "Este email ya está registrado para este evento."}), 409
+            raise
+
+        return jsonify({"ok": True})
+    except mysql.connector.Error as e:
+        app.logger.exception("Error de base de datos en api_registro")
+        return jsonify({"ok": False, "error": f"DB error: {e}"}), 500
+    except Exception as e:
+        app.logger.exception("Error inesperado en api_registro")
+        return jsonify({"ok": False, "error": f"Error interno: {e}"}), 500
+    finally:
+        if cur:
+            cur.close()
+        if cnx:
+            cnx.close()
 
 # ------- Admin --------
 
