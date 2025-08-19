@@ -28,6 +28,13 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const text = await res.text();
+        const errMsg = text || `Respuesta no JSON (Content-Type: ${contentType})`;
+        msg.innerHTML = `<div class="alert alert-danger">${errMsg}</div>`;
+        return;
+      }
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
