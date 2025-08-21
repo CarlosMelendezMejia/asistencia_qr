@@ -142,6 +142,10 @@ def api_registro():
         if cnx:
             cnx.close()
 
+@app.get("/success")
+def success():
+    return render_template("success.html")
+
 # ------- Admin --------
 
 @app.get("/admin/login")

@@ -10,7 +10,7 @@
           {% if evento.fecha_inicio %} • {{ evento.fecha_inicio }}{% endif %}
         </p>
 
-        <form id="formRegistro" novalidate>
+        <form id="formRegistro" data-api="{{ url_for('api_registro') }}" data-success="{{ url_for('success') }}" novalidate>
           <input type="hidden" name="slug" value="{{ evento.slug }}" />
 
           <div class="row g-3">
