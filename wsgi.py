@@ -5,14 +5,13 @@ from werkzeug.wrappers import Response
 # Carga la app Flask principal (debes tener "app" en app.py)
 from app import app as asistencia_app
 
-# Prefijo desde variable de entorno, por defecto /asistencia_qr
-APP_PREFIX = os.getenv("APP_PREFIX", "/asistencia_qr")
+# Prefijo desde variable de entorno; por defecto vacío (raíz '/')
+APP_PREFIX = os.getenv("APP_PREFIX", "").strip()
 
-# Normalizamos prefijo (sin doble slash)
-APP_PREFIX = "/" + APP_PREFIX.strip("/")
+# Montaje condicional: si hay prefijo, se monta en '/<prefijo>'; si no, en '/'
+mount_map = {f"/{APP_PREFIX.strip('/')}": asistencia_app} if APP_PREFIX else {"/": asistencia_app}
 
-# Si tu app ya maneja SCRIPT_NAME o prefijos internamente, puedes montar directo:
 application = DispatcherMiddleware(
     Response("Not Found", status=404),
-    {APP_PREFIX: asistencia_app}
+    mount_map,
 )
