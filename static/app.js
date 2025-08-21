@@ -3,6 +3,8 @@
   if (!form) return;
 
   const msg = document.getElementById("msg");
+  const apiUrl = form.dataset.api;
+  const successUrl = form.dataset.success;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@
     payload["consentimiento"] = formData.get("consentimiento") ? 1 : 0;
 
     try {
-      const res = await fetch("/api/registro", {
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -46,8 +48,10 @@
       // Éxito
       msg.innerHTML = `<div class="alert alert-success">¡Asistencia registrada! 🎉</div>`;
       form.reset();
-      // Si prefieres, redirige:
-      // window.location.href = "/success";
+      if (successUrl) {
+        window.location.href = successUrl;
+        return;
+      }
     } catch (err) {
       msg.innerHTML = `<div class="alert alert-danger">Error de red: ${String(err)}</div>`;
     }
