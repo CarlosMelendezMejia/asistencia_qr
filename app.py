@@ -32,18 +32,19 @@ def db_conn():
 
 
 def get_default_slug():
-    slug = os.getenv("DEFAULT_EVENT_SLUG")
-    if slug:
-        return slug
+    """Return slug of the active event or raise a clear error if none is active."""
     cnx = cur = None
     try:
         cnx = db_conn()
-        cur = cnx.cursor()
+        cur = cnx.cursor(dictionary=True)
         cur.execute(
-            "SELECT slug FROM evento WHERE activo=1 ORDER BY fecha_inicio DESC, creado_en DESC LIMIT 1"
+            "SELECT slug FROM evento WHERE activo=1 ORDER BY creado_en DESC LIMIT 1"
         )
         row = cur.fetchone()
-        return row[0] if row else None
+        if not row:
+            # 500 to signal misconfiguration; admin must create/activate an event
+            abort(500, description="No hay un evento activo. Crea y/o activa un evento desde Admin > Eventos.")
+        return row["slug"]
     finally:
         if cur:
             cur.close()
@@ -61,9 +62,7 @@ def admin_required(f):
 @app.get("/")
 def index():
     slug = get_default_slug()
-    if slug:
-        return redirect(url_for("evento_form", slug=slug))
-    return render_template("no_event.html")
+    return redirect(url_for("evento_form", slug=slug))
 
 @app.get("/evento/<slug>")
 def evento_form(slug):
@@ -174,8 +173,8 @@ def admin_panel():
     cnx = db_conn()
     cur = cnx.cursor(dictionary=True)
 
-    # Eventos para selector
-    cur.execute("SELECT id, slug, titulo FROM evento ORDER BY creado_en DESC")
+    # Eventos para selector y administración
+    cur.execute("SELECT id, slug, titulo, fecha_inicio, fecha_fin, lugar, activo FROM evento ORDER BY creado_en DESC")
     eventos = cur.fetchall()
 
     registros = []
@@ -191,6 +190,87 @@ def admin_panel():
 
     cur.close(); cnx.close()
     return render_template("admin.html", view="panel", eventos=eventos, registros=registros, slug=slug)
+
+# ------- Admin: crear/activar evento --------
+
+@app.route("/admin/evento", methods=["GET", "POST"])
+@admin_required
+def admin_evento():
+    if request.method == "GET":
+        # La forma de creación está embebida en el panel
+        return redirect(url_for("admin_panel"))
+
+    # POST: crear evento
+    form = request.form
+    slug = (form.get("slug") or "").strip()
+    titulo = (form.get("titulo") or "").strip()
+    fecha_inicio = (form.get("fecha_inicio") or "").strip()
+    fecha_fin = (form.get("fecha_fin") or "").strip()
+    lugar = (form.get("lugar") or "").strip()
+    activo = 1 if str(form.get("activo", "0")).lower() in ("1", "true", "on", "yes") else 0
+
+    if not slug or not titulo:
+        flash("Slug y título son obligatorios", "danger")
+        return redirect(url_for("admin_panel"))
+
+    # Parse datetime-local values (YYYY-MM-DDTHH:MM)
+    def parse_dt(val):
+        if not val:
+            return None
+        try:
+            v = val.replace("T", " ")
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+                try:
+                    return datetime.strptime(v, fmt)
+                except ValueError:
+                    continue
+        except Exception:
+            return None
+        return None
+
+    fi = parse_dt(fecha_inicio)
+    ff = parse_dt(fecha_fin)
+
+    cnx = db_conn()
+    cur = cnx.cursor()
+    try:
+        if activo:
+            cur.execute("UPDATE evento SET activo=0")
+        cur.execute(
+            """
+            INSERT INTO evento (slug, titulo, fecha_inicio, fecha_fin, lugar, activo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (slug, titulo, fi, ff, lugar, activo or 0),
+        )
+        cnx.commit()
+        flash("Evento creado correctamente", "success")
+    except mysql.connector.Error as e:
+        cnx.rollback()
+        if e.errno == 1062:
+            flash("El slug ya existe. Elige otro.", "danger")
+        else:
+            flash(f"Error de BD: {e}", "danger")
+    finally:
+        cur.close(); cnx.close()
+    return redirect(url_for("admin_panel"))
+
+@app.post("/admin/evento/<int:event_id>/activar")
+@admin_required
+def admin_evento_activar(event_id: int):
+    cnx = db_conn()
+    cur = cnx.cursor()
+    try:
+        cur.execute("UPDATE evento SET activo=0")
+        cur.execute("UPDATE evento SET activo=1 WHERE id=%s", (event_id,))
+        cnx.commit()
+        flash("Evento activado", "success")
+    except mysql.connector.Error as e:
+        cnx.rollback()
+        flash(f"Error de BD: {e}", "danger")
+    finally:
+        cur.close(); cnx.close()
+    return redirect(url_for("admin_panel"))
 
 @app.get("/admin/export")
 @admin_required

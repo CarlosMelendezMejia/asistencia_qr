@@ -36,4 +36,4 @@ CREATE TABLE IF NOT EXISTS registro (
 
 -- Evento de ejemplo
 INSERT IGNORE INTO evento (slug, titulo, fecha_inicio, lugar)
-VALUES ('ponencia-ia-ago2025', 'Ponencia: IA aplicada', '2025-08-20 10:00:00', 'Auditorio Principal');
+VALUES ('evento-prueba', 'Ponencia', '2025-08-20 10:00:00', 'Auditorio Principal');

@@ -49,6 +49,47 @@
       {% endif %}
     {% endwith %}
 
+    <!-- Crear evento -->
+    <div class="px-2 px-md-3 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Crear nuevo evento</h2>
+          <form class="row g-3" method="post" action="{{ url_for('admin_evento') }}">
+            <div class="col-md-4">
+              <label class="form-label">Slug*</label>
+              <input class="form-control" name="slug" placeholder="ej. ponencia-ia-ago2025" required />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Título*</label>
+              <input class="form-control" name="titulo" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Fecha inicio</label>
+              <input type="datetime-local" class="form-control" name="fecha_inicio" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Fecha fin</label>
+              <input type="datetime-local" class="form-control" name="fecha_fin" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Lugar</label>
+              <input class="form-control" name="lugar" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="activo" name="activo" />
+                <label class="form-check-label" for="activo">Activo</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary" type="submit">Crear evento</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros de registros por evento -->
     <form class="row g-2 align-items-end mb-3 px-2 px-md-3" method="get" action="{{ url_for('admin_panel') }}">
       <div class="col-md-6 col-lg-6 col-xl-6">
         <label class="form-label">Evento</label>
@@ -74,6 +115,53 @@
         </div>
       </div>
     </form>
+
+    <!-- Lista de eventos -->
+    <div class="px-2 px-md-3 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Eventos</h2>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Slug</th>
+                  <th>Título</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Lugar</th>
+                  <th>Activo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in eventos %}
+                <tr class="{% if e.activo %}table-success{% endif %}">
+                  <td>{{ loop.index }}</td>
+                  <td><code>{{ e.slug }}</code></td>
+                  <td>{{ e.titulo }}</td>
+                  <td>{{ e.fecha_inicio }}</td>
+                  <td>{{ e.fecha_fin }}</td>
+                  <td>{{ e.lugar }}</td>
+                  <td>{{ 'Sí' if e.activo else 'No' }}</td>
+                  <td>
+                    {% if not e.activo %}
+                      <form method="post" action="{{ url_for('admin_evento_activar', event_id=e.id) }}">
+                        <button class="btn btn-outline-primary btn-sm" type="submit">Activar</button>
+                      </form>
+                    {% else %}
+                      <span class="badge bg-success">Activo</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% if registros %}
       <div class="table-responsive px-2 px-md-3">
