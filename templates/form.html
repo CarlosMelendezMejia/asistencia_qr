@@ -688,6 +688,23 @@
     .modal-footer {
       padding: var(--spacing-sm);
     }
+
+    /* Añadido: padding lateral para que el formulario no quede pegado a la derecha */
+    .logos-container,
+    .form-card {
+      margin-right: var(--spacing-sm);
+      margin-left: 0.4rem; /* reducido para que no se vea tan separado a la izquierda */
+    }
+    .progress-indicator,
+    .form-section-wrapper,
+    .consent-section,
+    .submit-wrapper,
+    #msg {
+      padding-right: 1rem !important;
+      padding-left: .6rem !important; /* menor padding a la izquierda */
+    }
+    /* En caso de que algún contenedor flex empuje al borde */
+    .form-card-body { width: 100%; }
   }
 
   /* ========================================
