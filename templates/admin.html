@@ -193,16 +193,18 @@
                 {% endif %}
               </td>
               <td>
-                {% if not e.activo %}
+                {% if e.activo %}
+                  <form method="post" action="{{ url_for('admin_evento_desactivar', event_id=e.id) }}" class="d-inline">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">
+                      <i class="fas fa-stop"></i> Desactivar
+                    </button>
+                  </form>
+                {% else %}
                   <form method="post" action="{{ url_for('admin_evento_activar', event_id=e.id) }}" class="d-inline">
                     <button class="btn btn-sm btn-outline-success" type="submit">
                       <i class="fas fa-play"></i> Activar
                     </button>
                   </form>
-                {% else %}
-                  <button class="btn btn-sm btn-outline-secondary" disabled>
-                    <i class="fas fa-check"></i> Activo
-                  </button>
                 {% endif %}
               </td>
             </tr>
