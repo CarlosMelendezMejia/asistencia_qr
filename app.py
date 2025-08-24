@@ -285,6 +285,23 @@ def admin_evento_activar(event_id: int):
         cur.close(); cnx.close()
     return redirect(url_for("admin_panel"))
 
+
+@app.post("/admin/evento/<int:event_id>/desactivar")
+@admin_required
+def admin_evento_desactivar(event_id: int):
+    cnx = db_conn()
+    cur = cnx.cursor()
+    try:
+        cur.execute("UPDATE evento SET activo=0 WHERE id=%s", (event_id,))
+        cnx.commit()
+        flash("Evento desactivado", "success")
+    except mysql.connector.Error as e:
+        cnx.rollback()
+        flash(f"Error de BD: {e}", "danger")
+    finally:
+        cur.close(); cnx.close()
+    return redirect(url_for("admin_panel"))
+
 @app.get("/admin/export")
 @admin_required
 def admin_export():
