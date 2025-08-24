@@ -1,100 +1,673 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-8 col-lg-6">
-    <div class="card shadow-sm form-card">
+  <div class="col-xl-10 col-lg-11">
+    <!-- Sección de Logos -->
+    <div class="logos-container mb-4">
+      <div class="logo-wrapper">
+        <img src="{{ url_for('static', filename='logo1.png') }}" alt="Logo 1" class="logo-img" onerror="this.style.display='none'">
+        <div class="logo-placeholder">
+          <i class="fas fa-building"></i>
+          <span>Logo 1</span>
+        </div>
+      </div>
+      <div class="logo-wrapper">
+        <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo 2" class="logo-img" onerror="this.style.display='none'">
+        <div class="logo-placeholder">
+          <i class="fas fa-university"></i>
+          <span>Logo 2</span>
+        </div>
+      </div>
+      <div class="logo-wrapper">
+        <img src="{{ url_for('static', filename='logo3.png') }}" alt="Logo 3" class="logo-img" onerror="this.style.display='none'">
+        <div class="logo-placeholder">
+          <i class="fas fa-graduation-cap"></i>
+          <span>Logo 3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-lg form-card">
       <div class="card-body form-card-body">
-        <h1 class="h4 mb-3">{{ evento.titulo }}</h1>
-        <p class="text-muted mb-4">
-          {{ evento.lugar or "" }}
-          {% if evento.fecha_inicio %} • {{ evento.fecha_inicio }}{% endif %}
-        </p>
+        <!-- Header del evento con gradiente -->
+        <div class="event-header mb-4">
+          <div class="event-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h1 class="h3 mb-2 text-white">{{ evento.titulo }}</h1>
+          <div class="event-details">
+            {% if evento.lugar %}
+              <span class="event-detail-item">
+                <i class="fas fa-map-marker-alt me-1"></i>
+                {{ evento.lugar }}
+              </span>
+            {% endif %}
+            {% if evento.fecha_inicio %}
+              <span class="event-detail-item">
+                <i class="fas fa-clock me-1"></i>
+                {{ evento.fecha_inicio }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Progress indicator -->
+        <div class="progress-indicator mb-4">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <small class="text-muted mt-1 d-block">Completa todos los campos para registrarte</small>
+        </div>
 
         <form id="formRegistro" data-api="{{ url_for('api_registro') }}" data-success="{{ url_for('success') }}" novalidate>
           <input type="hidden" name="slug" value="{{ evento.slug }}" />
 
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Nombre*</label>
-              <input class="form-control" name="nombre" required />
+          <!-- Sección: Información Personal -->
+          <div class="form-section-wrapper mb-4">
+            <div class="section-header">
+              <i class="fas fa-user-circle section-icon"></i>
+              <h5 class="section-title">Información Personal</h5>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Apellidos*</label>
-              <input class="form-control" name="apellidos" required />
-            </div>
-            <div class="col-md-8">
-              <label class="form-label">Correo electrónico*</label>
-              <input type="email" class="form-control" name="email" required />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">Teléfono</label>
-              <input class="form-control" name="telefono" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Institución</label>
-              <input class="form-control" name="institucion" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Carrera/Área</label>
-              <input class="form-control" name="carrera_o_area" />
-            </div>
-            <div class="col-12">
-              <label class="form-label">Temas de actualización docente de interés</label>
-              <textarea class="form-control" name="temas_interes" rows="3"></textarea>
-            </div>
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="cons" name="consentimiento" />
-                <label class="form-check-label" for="cons">
-                  Acepto el aviso de privacidad y autorizo el uso de mis datos para fines del evento.
-                </label>
-                <small class="text-muted d-block mt-1">
-                  Consulta el
-                  <a href="#" data-bs-toggle="modal" data-bs-target="#avisoPrivacidadModal">Aviso de Privacidad</a>.
-                </small>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input class="form-control" id="nombre" name="nombre" placeholder="Juan" required />
+                  <label for="nombre">
+                    <i class="fas fa-user me-1"></i>
+                    Nombre*
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input class="form-control" id="apellidos" name="apellidos" placeholder="Pérez García" required />
+                  <label for="apellidos">
+                    <i class="fas fa-user me-1"></i>
+                    Apellidos*
+                  </label>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="d-grid mt-4">
-            <button class="btn btn-primary" type="submit">Registrar asistencia</button>
+          <!-- Sección: Contacto -->
+          <div class="form-section-wrapper mb-4">
+            <div class="section-header">
+              <i class="fas fa-envelope section-icon"></i>
+              <h5 class="section-title">Información de Contacto</h5>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <div class="form-floating">
+                  <input type="email" class="form-control" id="email" name="email" placeholder="correo@ejemplo.com" required />
+                  <label for="email">
+                    <i class="fas fa-at me-1"></i>
+                    Correo electrónico*
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input class="form-control" id="telefono" name="telefono" placeholder="555-1234567" />
+                  <label for="telefono">
+                    <i class="fas fa-phone me-1"></i>
+                    Teléfono
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
+
+          <!-- Sección: Información Académica/Profesional -->
+          <div class="form-section-wrapper mb-4">
+            <div class="section-header">
+              <i class="fas fa-briefcase section-icon"></i>
+              <h5 class="section-title">Información Académica/Profesional</h5>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input class="form-control" id="institucion" name="institucion" placeholder="Universidad XYZ" />
+                  <label for="institucion">
+                    <i class="fas fa-university me-1"></i>
+                    Institución
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating">
+                  <input class="form-control" id="carrera_o_area" name="carrera_o_area" placeholder="Ingeniería" />
+                  <label for="carrera_o_area">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    Carrera/Área
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección: Intereses -->
+          <div class="form-section-wrapper mb-4">
+            <div class="section-header">
+              <i class="fas fa-lightbulb section-icon"></i>
+              <h5 class="section-title">Áreas de Interés</h5>
+            </div>
+            <div class="form-floating">
+              <textarea class="form-control" id="temas_interes" name="temas_interes" placeholder="Describe tus intereses..." style="height: 100px"></textarea>
+              <label for="temas_interes">
+                <i class="fas fa-comments me-1"></i>
+                Temas de actualización docente de interés
+              </label>
+            </div>
+          </div>
+
+          <!-- Sección: Consentimiento -->
+          <div class="consent-section mb-4">
+            <div class="form-check custom-checkbox">
+              <input class="form-check-input" type="checkbox" id="cons" name="consentimiento" />
+              <label class="form-check-label" for="cons">
+                <i class="fas fa-shield-alt me-2 text-primary"></i>
+                Acepto el aviso de privacidad y autorizo el uso de mis datos para fines del evento
+              </label>
+            </div>
+            <small class="text-muted d-block mt-2 ms-4">
+              <i class="fas fa-info-circle me-1"></i>
+              Consulta el
+              <a href="#" data-bs-toggle="modal" data-bs-target="#avisoPrivacidadModal" class="privacy-link">
+                Aviso de Privacidad
+                <i class="fas fa-external-link-alt ms-1"></i>
+              </a>
+            </small>
+          </div>
+
+          <!-- Botón de envío con animación -->
+          <div class="d-grid">
+            <button class="btn btn-primary btn-lg submit-btn" type="submit">
+              <i class="fas fa-check-circle me-2"></i>
+              Registrar Asistencia
+              <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+            </button>
+          </div>
+          
           <div id="msg" class="mt-3"></div>
         </form>
+
+        <!-- Footer informativo -->
+        <div class="form-footer mt-4">
+          <div class="security-badge">
+            <i class="fas fa-lock me-2"></i>
+            <span>Registro 100% seguro</span>
+          </div>       </div>
       </div>
     </div>
   </div>
 </div>
-<!-- Modal: Aviso de Privacidad -->
+
+<!-- Modal: Aviso de Privacidad (mejorado) -->
 <div class="modal fade" id="avisoPrivacidadModal" tabindex="-1" aria-labelledby="avisoPrivacidadLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="avisoPrivacidadLabel">Aviso de Privacidad</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="avisoPrivacidadLabel">
+          <i class="fas fa-shield-alt me-2"></i>
+          Aviso de Privacidad
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
-        <p>
-          La información personal que nos proporcionas será utilizada únicamente para gestionar tu registro y
-          asistencia al evento, generar listados y, en su caso, enviarte comunicaciones relacionadas.
-        </p>
-        <p>
-          Los datos recabados incluyen: nombre, apellidos, correo electrónico y, de forma opcional, teléfono,
-          institución y carrera/área. No compartiremos tus datos con terceros salvo obligación legal.
-        </p>
-        <p>
-          Tienes derecho a acceder, rectificar y cancelar tus datos, así como a oponerte a su tratamiento.
-          Para ejercer estos derechos o realizar cualquier consulta sobre el tratamiento de tus datos,
-          contáctanos a través del medio indicado por la organización del evento.
-        </p>
-        <p class="mb-0">
-          Al marcar la casilla de consentimiento, confirmas que has leído y aceptas este aviso de privacidad.
-        </p>
+        <div class="privacy-content">
+          <div class="privacy-section">
+            <h6 class="privacy-heading">
+              <i class="fas fa-database text-primary me-2"></i>
+              Uso de Datos
+            </h6>
+            <p>
+              La información personal que nos proporcionas será utilizada únicamente para gestionar tu registro y
+              asistencia al evento, generar listados y, en su caso, enviarte comunicaciones relacionadas.
+            </p>
+          </div>
+          
+          <div class="privacy-section">
+            <h6 class="privacy-heading">
+              <i class="fas fa-list-ul text-primary me-2"></i>
+              Datos Recabados
+            </h6>
+            <p>
+              Los datos recabados incluyen: nombre, apellidos, correo electrónico y, de forma opcional, teléfono,
+              institución y carrera/área. No compartiremos tus datos con terceros salvo obligación legal.
+            </p>
+          </div>
+          
+          <div class="privacy-section">
+            <h6 class="privacy-heading">
+              <i class="fas fa-user-shield text-primary me-2"></i>
+              Tus Derechos
+            </h6>
+            <p>
+              Tienes derecho a acceder, rectificar y cancelar tus datos, así como a oponerte a su tratamiento.
+              Para ejercer estos derechos o realizar cualquier consulta sobre el tratamiento de tus datos,
+              contáctanos a través del medio indicado por la organización del evento.
+            </p>
+          </div>
+          
+          <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle me-2"></i>
+            Al marcar la casilla de consentimiento, confirmas que has leído y aceptas este aviso de privacidad.
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          <i class="fas fa-check me-2"></i>
+          Entendido
+        </button>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  /* Estilos específicos para el formulario mejorado */
+  .form-card {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+  }
+
+  .form-card-body {
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Logos Section */
+  .logos-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .logo-wrapper {
+    position: relative;
+    width: 120px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .logo-placeholder {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    background: #f8f9fa;
+    color: #6c757d;
+    font-size: 0.85rem;
+  }
+
+  .logo-placeholder i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.5;
+  }
+
+  .logo-img:not([src=""]) ~ .logo-placeholder {
+    display: none;
+  }
+
+  /* Event Header */
+  .event-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    position: relative;
+    margin: 0;
+  }
+
+  .event-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+
+  .event-details {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+  }
+
+  .event-detail-item {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Progress Indicator */
+  .progress-indicator {
+    padding: 0 2rem;
+  }
+
+  .progress {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+  }
+
+  /* Form Sections */
+  .form-section-wrapper {
+    padding: 0 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f2f5;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .section-title {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  /* Form Controls Enhancement */
+  .form-floating > .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    background: #fafbfc;
+    transition: all 0.3s ease;
+    padding: 1.625rem 0.75rem 0.625rem;
+  }
+
+  .form-floating > label {
+    color: #6c757d;
+    padding: 1rem 0.75rem;
+  }
+
+  .form-floating > label i {
+    color: #667eea;
+  }
+
+  .form-floating > .form-control:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+  }
+
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #667eea;
+    font-weight: 500;
+  }
+
+  /* Consent Section */
+  .consent-section {
+    background: #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    margin: 0 2rem;
+  }
+
+  .custom-checkbox .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.15rem;
+  }
+
+  .custom-checkbox .form-check-label {
+    padding-left: 0.5rem;
+    font-weight: 500;
+  }
+
+  .privacy-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .privacy-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    margin: 0 2rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Form Footer */
+  .form-footer {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+  }
+
+  .security-badge,
+  .qr-hint {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .security-badge i,
+  .qr-hint i {
+    color: #28a745;
+  }
+
+  /* Modal Improvements */
+  .privacy-content {
+    padding: 0.5rem;
+  }
+
+  .privacy-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .privacy-heading {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .logos-container {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .event-header {
+      padding: 2rem 1.5rem;
+    }
+
+    .event-details {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-section-wrapper,
+    .consent-section,
+    .submit-btn {
+      margin-left: 1rem;
+      margin-right: 1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .form-footer {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-section-wrapper {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  /* Message Alerts Enhancement */
+  #msg .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.5rem;
+    margin: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #msg .alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+  }
+
+  #msg .alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+  }
+
+  #msg .alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+  }
+</style>
+
+<script>
+// Progress bar functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('formRegistro');
+  if (!form) return;
+
+  const requiredFields = form.querySelectorAll('[required]');
+  const progressBar = document.querySelector('.progress-bar');
+  
+  function updateProgress() {
+    let filled = 0;
+    requiredFields.forEach(field => {
+      if (field.value.trim() !== '') {
+        filled++;
+      }
+    });
+    
+    const percentage = (filled / requiredFields.length) * 100;
+    progressBar.style.width = percentage + '%';
+    progressBar.setAttribute('aria-valuenow', percentage);
+  }
+
+  requiredFields.forEach(field => {
+    field.addEventListener('input', updateProgress);
+    field.addEventListener('change', updateProgress);
+  });
+
+  // Animate submit button on form submission
+  form.addEventListener('submit', function() {
+    const submitBtn = form.querySelector('.submit-btn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    spinner.classList.remove('d-none');
+    submitBtn.disabled = true;
+  });
+
+  // Reset spinner on error
+  const originalSubmitHandler = form.onsubmit;
+  form.onsubmit = async function(e) {
+    if (originalSubmitHandler) {
+      await originalSubmitHandler.call(this, e);
+    }
+    const submitBtn = form.querySelector('.submit-btn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    setTimeout(() => {
+      spinner.classList.add('d-none');
+      submitBtn.disabled = false;
+    }, 1000);
+  };
+});
+</script>
 {% endblock %}
