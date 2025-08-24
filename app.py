@@ -46,7 +46,7 @@ def db_conn():
 
 
 def get_default_slug():
-    """Return slug of the active event or raise a clear error if none is active."""
+    """Return slug of the active event or ``None`` if none is active."""
     cnx = cur = None
     try:
         cnx = db_conn()
@@ -55,10 +55,7 @@ def get_default_slug():
             "SELECT slug FROM evento WHERE activo=1 ORDER BY creado_en DESC LIMIT 1"
         )
         row = cur.fetchone()
-        if not row:
-            # 500 to signal misconfiguration; admin must create/activate an event
-            abort(500, description="No hay un evento activo. Crea y/o activa un evento desde Admin > Eventos.")
-        return row["slug"]
+        return row["slug"] if row else None
     finally:
         if cur:
             cur.close()
@@ -76,7 +73,9 @@ def admin_required(f):
 @app.get("/")
 def index():
     slug = get_default_slug()
-    return redirect(url_for("evento_form", slug=slug))
+    if slug:
+        return redirect(url_for("evento_form", slug=slug))
+    return render_template("no_event.html")
 
 @app.get("/evento/<slug>")
 def evento_form(slug):
