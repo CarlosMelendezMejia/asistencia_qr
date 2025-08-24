@@ -9,6 +9,7 @@ from flask import (
     jsonify, session, make_response, abort, flash
 )
 import mysql.connector
+from mysql.connector import pooling
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,8 +28,21 @@ DB_CONFIG = {
     "autocommit": True,
 }
 
+DB_POOL_NAME = os.getenv("DB_POOL_NAME", "asistencia_pool")
+DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", "15"))
+
+cnx_pool = pooling.MySQLConnectionPool(
+    pool_name=DB_POOL_NAME,
+    pool_size=DB_POOL_SIZE,
+    **DB_CONFIG,
+)
+
+
 def db_conn():
-    return mysql.connector.connect(**DB_CONFIG)
+    try:
+        return cnx_pool.get_connection()
+    except mysql.connector.errors.PoolError:
+        abort(503, description="No hay conexiones disponibles. Intenta nuevamente en un momento.")
 
 
 def get_default_slug():
