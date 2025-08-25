@@ -149,8 +149,19 @@ body[data-theme="dark"] .form-select {
 }
 
 body[data-theme="dark"] .form-control::placeholder {
-        color: #9ca3af;
+        color: transparent; /* ocultar placeholder en modo oscuro */
+        opacity: 0; /* Safari */
 }
+
+/* Ocultar también para otros motores/navegadores */
+body[data-theme="dark"] .form-control::-webkit-input-placeholder { color: transparent; opacity:0; }
+body[data-theme="dark"] .form-control::-moz-placeholder { color: transparent; opacity:0; }
+body[data-theme="dark"] .form-control:-ms-input-placeholder { color: transparent; opacity:0; }
+body[data-theme="dark"] .form-control::-ms-input-placeholder { color: transparent; opacity:0; }
+
+/* Si se requiere mostrar nuevamente (por accesibilidad) al enfocar, comentar las reglas anteriores o añadir:
+body[data-theme="dark"] .form-control:focus::placeholder { opacity:.35; }
+*/
 
 body[data-theme="dark"] .form-check-input {
         background-color: #1f2937;
