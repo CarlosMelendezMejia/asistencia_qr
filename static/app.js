@@ -57,3 +57,25 @@
     }
   });
 })();
+
+(function () {
+  const toggle = document.getElementById("themeToggle");
+  if (!toggle) return;
+  const root = document.documentElement;
+  const body = document.body;
+
+  function setTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    body.setAttribute("data-theme", theme);
+    toggle.innerHTML = theme === "dark" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  }
+
+  const saved = localStorage.getItem("theme") || "light";
+  setTheme(saved);
+
+  toggle.addEventListener("click", () => {
+    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("theme", next);
+  });
+})();
