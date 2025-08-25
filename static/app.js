@@ -70,7 +70,12 @@
     toggle.innerHTML = theme === "dark" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   }
 
-  const saved = localStorage.getItem("theme") || "light";
+  let saved = localStorage.getItem("theme");
+  if (!saved) {
+    saved = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
   setTheme(saved);
 
   toggle.addEventListener("click", () => {
